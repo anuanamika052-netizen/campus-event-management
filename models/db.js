@@ -17,6 +17,7 @@ const User = sequelize.define('User', {
 const Event = sequelize.define('Event', {
   title: { type: DataTypes.STRING, allowNull: false },
   description: { type: DataTypes.TEXT, allowNull: false },
+  category: { type: DataTypes.STRING, allowNull: false, defaultValue: 'General' },
   date: { type: DataTypes.STRING, allowNull: false },
   venue: { type: DataTypes.STRING, allowNull: false },
   limit: { type: DataTypes.INTEGER, allowNull: false },

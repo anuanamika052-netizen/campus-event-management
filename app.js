@@ -1,9 +1,90 @@
 const express = require('express');
 const session = require('express-session');
 const bcrypt = require('bcryptjs');
+const { DataTypes } = require('sequelize');
 const { sequelize, User, Event, Registration } = require('./models/db');
 
 const app = express();
+
+const DEMO_EVENTS = [
+  {
+    title: 'TechFest 2026',
+    category: 'Technical',
+    date: '2026-11-05',
+    description: 'An engineering college technology festival with project showcases, technical challenges, and student demonstrations.',
+    venue: 'Engineering Block',
+    limit: 250
+  },
+  {
+    title: 'CodeSprint',
+    category: 'Technical',
+    date: '2026-11-12',
+    description: 'A team-based coding competition where students design and build innovative software solutions.',
+    venue: 'Computer Science Lab',
+    limit: 100
+  },
+  {
+    title: 'Rhythm Night',
+    category: 'Cultural',
+    date: '2026-11-19',
+    description: 'An evening of student music and dance performances celebrating campus creativity and talent.',
+    venue: 'Main Auditorium',
+    limit: 300
+  },
+  {
+    title: 'Sports Carnival',
+    category: 'Sports',
+    date: '2026-11-26',
+    description: 'An interdepartmental sports meet featuring athletics and indoor and outdoor games.',
+    venue: 'College Sports Ground',
+    limit: 300
+  },
+  {
+    title: 'Creative Canvas',
+    category: 'Cultural',
+    date: '2026-12-03',
+    description: 'A student art showcase and creative workshop featuring illustration, design, and collaborative projects.',
+    venue: 'Central Exhibition Hall',
+    limit: 120
+  },
+  {
+    title: 'InnovateX',
+    category: 'Workshop',
+    date: '2026-12-10',
+    description: 'An innovation showcase where engineering students present prototypes and explore emerging technologies.',
+    venue: 'Innovation Lab',
+    limit: 150
+  }
+];
+
+async function seedDemoEvents() {
+  const tableName = Event.getTableName();
+  const columns = await sequelize.getQueryInterface().describeTable(tableName);
+
+  if (!columns.category) {
+    await sequelize.getQueryInterface().addColumn(tableName, 'category', {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: 'General'
+    });
+  }
+
+  const existingEvent = await Event.findOne();
+  const organizer = (existingEvent && await User.findByPk(existingEvent.organizerId)) ||
+    (await User.findOne({ where: { role: 'admin' } })) ||
+    (await User.findOne({ where: { role: 'organizer' } }));
+
+  if (!organizer) {
+    throw new Error('Cannot add sample events because no event organizer account exists.');
+  }
+
+  for (const event of DEMO_EVENTS) {
+    await Event.findOrCreate({
+      where: { title: event.title },
+      defaults: { ...event, organizerId: organizer.id }
+    });
+  }
+}
 
 app.set('view engine', 'ejs');
 app.use(express.urlencoded({ extended: true }));
@@ -71,13 +152,14 @@ app.post('/events/create', async (req, res) => {
     return res.status(403).send('Unauthorized');
   }
 
-  const { title, description, date, venue, limit } = req.body;
+  const { title, description, date, venue, limit, category } = req.body;
   await Event.create({
     title,
     description,
     date,
     venue,
     limit,
+    category: category || 'General',
     organizerId: req.session.user.id
   });
 
@@ -110,6 +192,13 @@ app.post('/events/:id/delete', async (req, res) => {
   res.redirect('/');
 });
 
-sequelize.sync().then(() => {
-  app.listen(3000, () => console.log('Server running on http://localhost:3000'));
-});
+sequelize.sync()
+  .then(seedDemoEvents)
+  .then(() => {
+    const port = process.env.PORT || 3000;
+    app.listen(port, () => console.log(`Server running on http://localhost:${port}`));
+  })
+  .catch((err) => {
+    console.error('Unable to initialize the campus event database:', err);
+    process.exitCode = 1;
+  });
