@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Campus Event Management System</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --accent-badge: #38bdf8;
+      --danger: #ef4444;
+      --border: #334155;
+    }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      margin: 0;
+      background-color: var(--bg);
+      color: var(--text);
+    }
+    header {
+      background: #1e293b;
+      border-bottom: 1px solid var(--border);
+      padding: 16px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .brand { font-size: 1.25rem; font-weight: 700; color: #f8fafc; letter-spacing: -0.5px; }
+    .brand span { color: var(--primary); }
+    nav a, nav .user-info { color: var(--text-muted); margin-left: 20px; text-decoration: none; font-size: 0.9rem; }
+    nav a.btn-link {
+      background: var(--primary);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: 500;
+    }
+    .container { max-width: 1000px; margin: 40px auto; padding: 0 20px; }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      padding: 24px;
+      margin-bottom: 24px;
+      border-radius: 12px;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+      transition: transform 0.2s, border-color 0.2s;
+    }
+    .card:hover { border-color: #475569; }
+    input, textarea, button {
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0;
+      background: #0f172a;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      box-sizing: border-box;
+      outline: none;
+    }
+    input:focus, textarea:focus { border-color: var(--primary); }
+    button { background: var(--primary); color: white; border: none; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+    button:hover { background: var(--primary-hover); }
+    button.danger { background: transparent; border: 1px solid var(--danger); color: var(--danger); }
+    button.danger:hover { background: var(--danger); color: white; }
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      background: rgba(56, 189, 248, 0.1);
+      color: var(--accent-badge);
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+    .event-meta { font-size: 0.875rem; color: var(--text-muted); margin-top: 12px; display: flex; gap: 15px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">Campus<span>Events</span></div>
+    <nav>
+      <% if (user) { %>
+        <span class="user-info">Hey, <strong><%= user.name %></strong> (<%= user.role %>)</span>
+        <a href="/logout">Logout</a>
+      <% } else { %>
+        <a href="/login">Login</a>
+        <a href="/register" class="btn-link">Register</a>
+      <% } %>
+    </nav>
+  </header>
+
+  <div class="container">
+    <% if (user && (user.role === 'organizer' || user.role === 'admin')) { %>
+      <div class="card">
+        <h3>Create Event</h3>
+        <form action="/events/create" method="POST">
+          <input type="text" name="title" placeholder="Event Title" required>
+          <textarea name="description" placeholder="Description..." rows="3" required></textarea>
+          <div style="display: flex; gap: 10px;">
+            <input type="date" name="date" required>
+            <input type="text" name="venue" placeholder="Venue" required>
+            <input type="number" name="limit" placeholder="Limit" required>
+          </div>
+          <button type="submit">Publish Event</button>
+        </form>
+      </div>
+    <% } %>
+
+    <h2 style="margin-bottom: 20px; font-weight: 600;">Upcoming Events</h2>
+    
+    <% if (events.length === 0) { %>
+      <p style="color: var(--text-muted);">No active events at this time.</p>
+    <% } else { %>
+      <div class="grid">
+        <% events.forEach(event => { %>
+          <div class="card">
+            <span class="badge">UPCOMING</span>
+            <h3 style="margin: 0 0 10px 0;"><%= event.title %></h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin: 0;"><%= event.description %></p>
+            
+            <div class="event-meta">
+              <span>📅 <%= event.date %></span>
+              <span>📍 <%= event.venue %></span>
+              <span>👥 <%= event.limit %> max</span>
+            </div>
+
+            <% if (user && user.role === 'student') { %>
+              <form action="/events/<%= event.id %>/register" method="POST" style="margin-top: 15px;">
+                <button type="submit">Register Now</button>
+              </form>
+            <% } %>
+
+            <% if (user && (user.role === 'admin' || user.id === event.organizerId)) { %>
+              <form action="/events/<%= event.id %>/delete" method="POST" style="margin-top: 10px;">
+                <button type="submit" class="danger">Delete Event</button>
+              </form>
+            <% } %>
+          </div>
+        <% }) %>
+      </div>
+    <% } %>
+  </div>
+</body>
+</html>

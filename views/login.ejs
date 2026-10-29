@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login - Campus Event Manager</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --border: #334155;
+    }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 40px;
+      width: 320px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+    }
+    h2 { margin-top: 0; font-size: 1.5rem; text-align: center; }
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0 16px;
+      background: #0f172a;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      box-sizing: border-box;
+      outline: none;
+    }
+    input:focus { border-color: var(--primary); }
+    button {
+      width: 100%;
+      padding: 12px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    button:hover { background: var(--primary-hover); }
+    .error { color: #f87171; font-size: 0.875rem; margin-bottom: 12px; text-align: center; }
+    a { color: #38bdf8; text-decoration: none; font-size: 0.875rem; }
+    a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Welcome Back</h2>
+    <% if (error) { %><p class="error"><%= error %></p><% } %>
+    <form action="/login" method="POST">
+      <label style="font-size: 0.875rem; color: var(--text-muted);">Email</label>
+      <input type="email" name="email" required placeholder="admin@campus.edu">
+      
+      <label style="font-size: 0.875rem; color: var(--text-muted);">Password</label>
+      <input type="password" name="password" required placeholder="••••••••">
+      
+      <button type="submit">Sign In</button>
+    </form>
+    <p style="text-align:center; margin-top: 20px; font-size: 0.875rem; color: var(--text-muted);">
+      Don't have an account? <a href="/register">Register</a>
+    </p>
+  </div>
+</body>
+</html>

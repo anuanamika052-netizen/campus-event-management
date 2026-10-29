@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Register - Campus Event Manager</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent: #10b981;
+      --accent-hover: #059669;
+      --border: #334155;
+    }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 40px;
+      width: 340px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+    }
+    h2 { margin-top: 0; font-size: 1.5rem; text-align: center; }
+    input, select {
+      width: 100%;
+      padding: 12px;
+      margin: 6px 0 16px;
+      background: #0f172a;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      box-sizing: border-box;
+      outline: none;
+    }
+    input:focus, select:focus { border-color: var(--accent); }
+    button {
+      width: 100%;
+      padding: 12px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    button:hover { background: var(--accent-hover); }
+    .error { color: #f87171; font-size: 0.875rem; margin-bottom: 12px; text-align: center; }
+    a { color: #38bdf8; text-decoration: none; font-size: 0.875rem; }
+    a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Create Account</h2>
+    <% if (error) { %><p class="error"><%= error %></p><% } %>
+    <form action="/register" method="POST">
+      <label style="font-size: 0.875rem; color: var(--text-muted);">Full Name</label>
+      <input type="text" name="name" required placeholder="Alex Johnson">
+
+      <label style="font-size: 0.875rem; color: var(--text-muted);">Email</label>
+      <input type="email" name="email" required placeholder="alex@campus.edu">
+
+      <label style="font-size: 0.875rem; color: var(--text-muted);">Password</label>
+      <input type="password" name="password" required placeholder="••••••••">
+
+      <label style="font-size: 0.875rem; color: var(--text-muted);">Role</label>
+      <select name="role">
+        <option value="student">Student</option>
+        <option value="organizer">Organizer</option>
+      </select>
+
+      <button type="submit">Sign Up</button>
+    </form>
+    <p style="text-align:center; margin-top: 20px; font-size: 0.875rem; color: var(--text-muted);">
+      Already have an account? <a href="/login">Login</a>
+    </p>
+  </div>
+</body>
+</html>
